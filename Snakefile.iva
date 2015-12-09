@@ -1,0 +1,17 @@
+IDS, = glob_wildcards("{id}_1.fastq")
+
+rule all:
+  input:
+    expand("{id}.trim.good.iva", id=IDS)
+
+rule iva:
+  input:
+    ["{d1}_1","{d1}_2"]
+  output:
+    touch("{d1}.iva")
+  params:
+    prefix="{d1}_iva"
+  threads:
+    4
+  shell:
+    "iva --threads {threads} -f {input[0]} -r {input[1]} {params.prefix}"

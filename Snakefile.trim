@@ -1,0 +1,17 @@
+IDS, = glob_wildcards("{id}_1.fastq")
+
+TRIMMOMATIC = "TrimmomaticPE"
+ADAPTERS = "/usr/share/trimmomatic/NexteraPE-PE.fa"
+
+
+rule all:
+  input:
+    expand(["{id}.trim.good_1","{id}.trim.good_2"], id=IDS)
+
+rule trim:
+  input:
+    ["{d1}_1_uniq.fastq","{d1}_2_uniq.fastq"]
+  output:
+    ["{d1}.trim.good_1","{d1}.trim.bad_1","{d1}.trim.good_2","{d1}.trim.bad_2","{d1}.trim.log"]
+  shell:
+    "{TRIMMOMATIC} -threads 4 -phred33 -trimlog {output[4]} {input[0]} {input[1]} {output[0]} {output[1]} {output[2]} {output[3]} ILLUMINACLIP:{ADAPTERS}:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:60"

@@ -1,0 +1,21 @@
+IDS, = glob_wildcards("{id}_1.fastq")
+
+rule all:
+  input:
+    expand(["{id}_1_uniq.fastq","{id}_2_uniq.fastq"], id=IDS)
+
+rule prepare_fastuniq:
+  input:
+    ["{d1}_1.fastq","{d1}_2.fastq"]
+  output:
+    temp("{d1}.uniq_files")
+  shell:
+    "touch {output}; echo '{input[0]}\n{input[1]}'  >> {output}"
+
+rule fastuniq:
+  input:
+    ["{d1}_1.fastq","{d1}_2.fastq","{d1}.uniq_files"]
+  output:
+    ["{d1}_1_uniq.fastq","{d1}_2_uniq.fastq"]
+  shell:
+    "fastuniq -i {input[2]} -t q -o {output[0]} -p {output[1]}"
